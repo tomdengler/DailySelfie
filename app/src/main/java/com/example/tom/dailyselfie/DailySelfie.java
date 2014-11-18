@@ -1,13 +1,17 @@
 package com.example.tom.dailyselfie;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 
-// TODO: Requirement #1: camera icon
+
+// Requirement #1: camera icon
 // <item android:id="@+id/item1" android:title="Launch Camera" android:icon="@android:drawable/ic_menu_camera" />
 // From the initial app screen, is there a camera icon in the Action Bar?
 // If so, then if the user clicks on the camera icon in the ActionBar, does the app open up a
@@ -32,12 +36,18 @@ import android.widget.Toast;
 // notification view cause the Daily Selfie app to reopen?
 
 
-public class DailySelfie extends Activity {
+public class DailySelfie extends ListActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_daily_selfie);
+
+        List<String> photoList = new ArrayList<String>();
+        photoList.add("Hello");
+        photoList.add("World");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, photoList);
+        setListAdapter(adapter);
     }
 
 
