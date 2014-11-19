@@ -38,4 +38,10 @@ public class SelfieListAdapter extends ArrayAdapter {
         return rowView;
     }
 
+    public void add(Selfie listItem)
+    {
+        selfies.add(listItem);
+        notifyDataSetChanged();
+    }
+
 }

@@ -1,7 +1,10 @@
 package com.example.tom.dailyselfie;
 
 import android.app.ListActivity;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -38,6 +41,9 @@ import java.util.List;
 
 public class DailySelfie extends ListActivity {
 
+    private static final int ACTION_TAKE_PHOTO = 1;
+    private SelfieListAdapter mImagesAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +52,8 @@ public class DailySelfie extends ListActivity {
         selfies.add(new Selfie("selfie1",R.drawable.selfie01));
         selfies.add(new Selfie("selfie2",R.drawable.selfie02));
 
-        SelfieListAdapter imagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
-        setListAdapter(imagesAdapter);
+        mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
+        setListAdapter(mImagesAdapter);
     }
 
     @Override
@@ -75,9 +81,41 @@ public class DailySelfie extends ListActivity {
         return super.onOptionsItemSelected(item);
         }
 
+    private void addImage(Bitmap imageBitmap)
+    {
+        mImagesAdapter.add(new Selfie("mad selfie3",R.drawable.selfie03));
+    }
+
     private void launchCamera() {
-        // TODO: launch camera app
-        Toast.makeText(this,"Launching the camera app",Toast.LENGTH_LONG).show();
+        // launch camera app
+        dispatchTakePictureIntent(ACTION_TAKE_PHOTO);
+    }
+
+    private void dispatchTakePictureIntent(int actionCode) {
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, actionCode);
+        }
+        else
+            Toast.makeText(this,"Could not launch the camera.",Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case ACTION_TAKE_PHOTO: {
+                if (resultCode == RESULT_OK) {
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    addImage(imageBitmap);
+                }
+                else
+                    Toast.makeText(this,"The pic was not taken",Toast.LENGTH_LONG).show();
+            }
+            break;
+        }
     }
 
 }
