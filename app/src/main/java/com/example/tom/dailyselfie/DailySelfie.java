@@ -42,14 +42,13 @@ public class DailySelfie extends ListActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        List<String> photoList = new ArrayList<String>();
-        photoList.add("Hello");
-        photoList.add("World");
+        List selfies = new ArrayList();
+        selfies.add(new Selfie("selfie1",R.drawable.selfie01));
+        selfies.add(new Selfie("selfie2",R.drawable.selfie02));
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.list_item, photoList);
-        setListAdapter(adapter);
+        SelfieListAdapter imagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
+        setListAdapter(imagesAdapter);
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
