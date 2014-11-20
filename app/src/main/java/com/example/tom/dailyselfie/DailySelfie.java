@@ -3,14 +3,23 @@ package com.example.tom.dailyselfie;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -20,10 +29,11 @@ import java.util.List;
 // If so, then if the user clicks on the camera icon in the ActionBar, does the app open up a
 // picture-taking app already installed on the device?
 
-// TODO: Requirement #2: thumbnail picture added to listview
+// Requirement #2: thumbnail picture added to listview
 // If the user snaps a picture with the picture-taking and then accepts it, is
 // the picture returned to the DailySelfie app and then displayed in some way to the user along
 // with other selfies the user may have already taken?
+// along with other already taken is in requirement #4
 
 // TODO: Requirement #3: clicking thumbnail shows full picture
 // If the user clicks on a small view of a selfie, does a large view of the same selfie appear?
@@ -43,14 +53,16 @@ public class DailySelfie extends ListActivity {
 
     private static final int ACTION_TAKE_PHOTO = 1;
     private SelfieListAdapter mImagesAdapter;
+    private String TAG = "Tag-DailySelfie";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         List selfies = new ArrayList();
-        selfies.add(new Selfie("selfie1",R.drawable.selfie01));
-        selfies.add(new Selfie("selfie2",R.drawable.selfie02));
+        selfies.add(new Selfie("selfie1",Uri.parse("android.resource://com.example.tom.dailyselfie/"+R.drawable.selfie01)));
+        selfies.add(new Selfie("selfie2",Uri.parse("android.resource://com.example.tom.dailyselfie/"+R.drawable.selfie02)));
+
 
         mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
         setListAdapter(mImagesAdapter);
@@ -83,7 +95,9 @@ public class DailySelfie extends ListActivity {
 
     private void addImage(Bitmap imageBitmap)
     {
-        mImagesAdapter.add(new Selfie("mad selfie3",R.drawable.selfie03));
+        Selfie selfie = new Selfie("mad selfie3");
+        selfie.setImageUri(storeImage(imageBitmap));
+        mImagesAdapter.add(selfie);
     }
 
     private void launchCamera() {
@@ -117,5 +131,45 @@ public class DailySelfie extends ListActivity {
             break;
         }
     }
+
+    private Uri storeImage(Bitmap image) {
+        File pictureFile = createImageFile();
+        if (pictureFile == null) {
+            Log.d(TAG,
+                    "Error creating media file, check storage permissions: ");// e.getMessage());
+            return null;
+        }
+        try {
+            FileOutputStream fos = new FileOutputStream(pictureFile);
+            image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+            fos.close();
+            return Uri.fromFile(pictureFile);
+        } catch (FileNotFoundException e) {
+            Log.d(TAG, "File not found: " + e.getMessage());
+        } catch (IOException e) {
+            Log.d(TAG, "Error accessing file: " + e.getMessage());
+        }
+        return null;
+    }
+
+    private File createImageFile()  {
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = DailySelfie.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        try {
+            return File.createTempFile(
+                    imageFileName,  /* prefix */
+                    ".jpg",         /* suffix */
+                    storageDir      /* directory */
+            );
+        }catch (IOException e) {
+            Log.d(TAG, "Error creating image file: " + e.getMessage());
+            return null;
+        }
+    }
+
+
 
 }

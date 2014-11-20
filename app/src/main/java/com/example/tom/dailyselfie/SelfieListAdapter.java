@@ -33,7 +33,7 @@ public class SelfieListAdapter extends ArrayAdapter {
 
         Selfie currentSelfie = (Selfie) selfies.get(position);
         txtTitle.setText(currentSelfie.getName());
-        imageView.setImageResource(currentSelfie.getDrawableId());
+        imageView.setImageURI(currentSelfie.getImageUri());
 
         return rowView;
     }
