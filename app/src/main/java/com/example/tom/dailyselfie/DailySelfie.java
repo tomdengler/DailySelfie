@@ -124,6 +124,7 @@ public class DailySelfie extends ListActivity {
 
     private void addImage(Bitmap imageBitmap)
     {
+        // TODO : give image a proper text field
         Selfie selfie = new Selfie("mad selfie3");
         selfie.setImageUri(storeImage(imageBitmap));
         mImagesAdapter.add(selfie);
@@ -184,13 +185,13 @@ public class DailySelfie extends ListActivity {
     private File createImageFile()  {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "PNG_" + timeStamp + "_";
         File storageDir = DailySelfie.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         try {
             return File.createTempFile(
                     imageFileName,  /* prefix */
-                    ".jpg",         /* suffix */
+                    ".png",         /* suffix */
                     storageDir      /* directory */
             );
         }catch (IOException e) {
