@@ -38,7 +38,7 @@ import java.util.List;
 // TODO: Requirement #3: clicking thumbnail shows full picture
 // If the user clicks on a small view of a selfie, does a large view of the same selfie appear?
 
-// TODO: Requirement #4: pics are saved in persistent storage
+// Requirement #4: pics are saved in persistent storage
 // If the user opens the app, takes at least one selfie, then exits the app,
 // and then reopens it, do they have access to all the selfies saved on their device?
 
@@ -60,12 +60,41 @@ public class DailySelfie extends ListActivity {
         super.onCreate(savedInstanceState);
 
         List selfies = new ArrayList();
-        selfies.add(new Selfie("selfie1",Uri.parse("android.resource://com.example.tom.dailyselfie/"+R.drawable.selfie01)));
-        selfies.add(new Selfie("selfie2",Uri.parse("android.resource://com.example.tom.dailyselfie/"+R.drawable.selfie02)));
-
 
         mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
         setListAdapter(mImagesAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        List<Selfie> selfies = getLocalSelfies();
+
+        if (selfies.isEmpty())
+            return;
+
+        mImagesAdapter.clear();
+        for (Selfie s : selfies)
+                mImagesAdapter.add(s);
+    }
+
+    private List getLocalSelfies()
+    {
+        Log.i(TAG,"enter getLocalSelfies()");
+        File storageDir = DailySelfie.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File selfieImages[] = storageDir.listFiles();
+
+        List selfies = new ArrayList();
+
+        for (File imageFile : selfieImages)
+        {
+            Selfie selfie = new Selfie("existing");
+            selfie.setImageUri(Uri.fromFile(imageFile));
+            selfies.add(selfie);
+        }
+
+        return selfies;
     }
 
     @Override
