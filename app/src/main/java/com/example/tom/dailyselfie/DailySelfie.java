@@ -10,7 +10,6 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import java.io.File;
@@ -90,7 +89,7 @@ public class DailySelfie extends ListActivity {
         for (File imageFile : selfieImages)
         {
             Selfie selfie = new Selfie("existing");
-            selfie.setImageUri(Uri.fromFile(imageFile));
+            selfie.setThumbnailUri(Uri.fromFile(imageFile));
             selfies.add(selfie);
         }
 
@@ -126,7 +125,7 @@ public class DailySelfie extends ListActivity {
     {
         // TODO : give image a proper text field
         Selfie selfie = new Selfie("mad selfie3");
-        selfie.setImageUri(storeImage(imageBitmap));
+        selfie.setThumbnailUri(storeImage(imageBitmap));
         mImagesAdapter.add(selfie);
     }
 

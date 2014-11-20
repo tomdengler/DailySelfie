@@ -7,16 +7,16 @@ import android.net.Uri;
  */
 public class Selfie {
     private String name;
-    private Uri imageUri;
+    private Uri thumbnailUri;
 
     public Selfie(String name) {
         this.name = name;
-        this.imageUri = null;
+        this.thumbnailUri = null;
     }
 
     public Selfie(String name,Uri uri) {
         this.name = name;
-        this.imageUri = uri;
+        this.thumbnailUri = uri;
     }
 
     public String getName() {
@@ -27,11 +27,11 @@ public class Selfie {
         this.name = name;
     }
 
-    public Uri getImageUri() {
-        return imageUri;
+    public Uri getThumbnailUri() {
+        return thumbnailUri;
     }
 
-    public void setImageUri(Uri imageUri) {
-        this.imageUri = imageUri;
+    public void setThumbnailUri(Uri thumbnailUri) {
+        this.thumbnailUri = thumbnailUri;
     }
 }
