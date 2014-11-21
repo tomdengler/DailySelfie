@@ -53,16 +53,22 @@ public class DailySelfie extends ListActivity {
     private static final int ACTION_TAKE_PHOTO = 1;
     private SelfieListAdapter mImagesAdapter;
     private String TAG = "Tag-DailySelfie";
+    private Uri mCurrentImageUri = null;
+    private String mThumbnailFolder = null;
+    private String mImageFolder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        initFolderNames();
 
         List selfies = new ArrayList();
 
         mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
         setListAdapter(mImagesAdapter);
     }
+
 
     @Override
     protected void onResume() {
@@ -81,7 +87,7 @@ public class DailySelfie extends ListActivity {
     private List getLocalSelfies()
     {
         Log.i(TAG,"enter getLocalSelfies()");
-        File storageDir = DailySelfie.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File storageDir = DailySelfie.this.getExternalFilesDir(mThumbnailFolder);
         File selfieImages[] = storageDir.listFiles();
 
         List selfies = new ArrayList();
@@ -126,6 +132,7 @@ public class DailySelfie extends ListActivity {
         // TODO : give image a proper text field
         Selfie selfie = new Selfie("mad selfie3");
         selfie.setThumbnailUri(storeImage(imageBitmap));
+        selfie.setFullimageUri(mCurrentImageUri);
         mImagesAdapter.add(selfie);
     }
 
@@ -137,6 +144,16 @@ public class DailySelfie extends ListActivity {
     private void dispatchTakePictureIntent(int actionCode) {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        // File f = createImageFile(true);
+        // mCurrentImageUri = Uri.fromFile(f);
+
+        // the following actually creates a jpg file (not a png)
+        // and also makes it so that the thumbnail from data.getExtras() in onActivityResult
+        // is not available.
+        // todo: get back fullsize and convert to thumbnail
+        // todo: persist the selfie array list to get references to the files
+        // takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentImageUri);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, actionCode);
         }
@@ -162,7 +179,7 @@ public class DailySelfie extends ListActivity {
     }
 
     private Uri storeImage(Bitmap image) {
-        File pictureFile = createImageFile();
+        File pictureFile = createImageFile(true);
         if (pictureFile == null) {
             Log.d(TAG,
                     "Error creating media file, check storage permissions: ");// e.getMessage());
@@ -181,11 +198,12 @@ public class DailySelfie extends ListActivity {
         return null;
     }
 
-    private File createImageFile()  {
+    private File createImageFile(boolean thumbnail)  {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
         String imageFileName = "PNG_" + timeStamp + "_";
-        File storageDir = DailySelfie.this.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        File storageDir = DailySelfie.this.getExternalFilesDir(mImageFolder);
 
         try {
             return File.createTempFile(
@@ -199,6 +217,16 @@ public class DailySelfie extends ListActivity {
         }
     }
 
+    private void initFolderNames() {
+        mThumbnailFolder = Environment.DIRECTORY_PICTURES+"/thumbnails";
+        mImageFolder = Environment.DIRECTORY_PICTURES+"/images";
+        File folder = DailySelfie.this.getExternalFilesDir(mThumbnailFolder);
+        if (!folder.exists())
+            folder.mkdir();
+        folder = DailySelfie.this.getExternalFilesDir(mImageFolder);
+        if (!folder.exists())
+            folder.mkdir();
+    }
 
 
 }

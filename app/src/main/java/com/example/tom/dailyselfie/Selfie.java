@@ -8,10 +8,12 @@ import android.net.Uri;
 public class Selfie {
     private String name;
     private Uri thumbnailUri;
+    private Uri fullimageUri;
 
     public Selfie(String name) {
         this.name = name;
         this.thumbnailUri = null;
+        this.fullimageUri = null;
     }
 
     public Selfie(String name,Uri uri) {
@@ -33,5 +35,13 @@ public class Selfie {
 
     public void setThumbnailUri(Uri thumbnailUri) {
         this.thumbnailUri = thumbnailUri;
+    }
+
+    public Uri getFullimageUri() {
+        return fullimageUri;
+    }
+
+    public void setFullimageUri(Uri fullimageUri) {
+        this.fullimageUri = fullimageUri;
     }
 }
