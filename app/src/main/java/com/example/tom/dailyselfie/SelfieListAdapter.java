@@ -44,4 +44,9 @@ public class SelfieListAdapter extends ArrayAdapter {
         notifyDataSetChanged();
     }
 
+    public Selfie getItem(int position)
+    {
+        return (Selfie)selfies.get(position);
+    }
+
 }

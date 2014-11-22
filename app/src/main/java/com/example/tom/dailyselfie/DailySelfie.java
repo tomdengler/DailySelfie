@@ -12,6 +12,9 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -43,7 +46,7 @@ import java.util.List;
 // with other selfies the user may have already taken?
 // along with other already taken is in requirement #4
 
-// TODO: Requirement #3: clicking thumbnail shows full picture
+// Requirement #3: clicking thumbnail shows full picture
 // If the user clicks on a small view of a selfie, does a large view of the same selfie appear?
 
 // Requirement #4: pics are saved in persistent storage
@@ -55,7 +58,6 @@ import java.util.List;
 // that fires roughly once every two minutes, putting a notification area notification in the
 // notification area? If so, does pulling down on the notification area and clicking on the
 // notification view cause the Daily Selfie app to reopen?
-
 
 public class DailySelfie extends ListActivity {
 
@@ -77,6 +79,22 @@ public class DailySelfie extends ListActivity {
 
         mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
         setListAdapter(mImagesAdapter);
+
+        ListView v = getListView();
+        v.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Selfie s = mImagesAdapter.getItem(position);
+                showBigPicture(s.getFullimageUri());
+            }});
+    }
+
+    private void showBigPicture(Uri imageUri) {
+        Intent intent = new Intent();
+        intent.setAction(android.content.Intent.ACTION_VIEW);
+        intent.setDataAndType(imageUri, "image/jpg");
+        startActivity(intent);
     }
 
     @Override
@@ -95,7 +113,7 @@ public class DailySelfie extends ListActivity {
 
     private List getLocalSelfies()
     {
-        Log.i(TAG,"enter getLocalSelfies()");
+        Log.i(TAG, "enter getLocalSelfies()");
         return loadSelfies();
     }
 
