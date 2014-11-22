@@ -56,7 +56,7 @@ import java.util.List;
 // If the user opens the app, takes at least one selfie, then exits the app,
 // and then reopens it, do they have access to all the selfies saved on their device?
 
-// TODO: Requirement #5: periodic alarm in notification area
+// Requirement #5: periodic alarm in notification area
 // If the app starts up at least once, does the app create and set an Alarm
 // that fires roughly once every two minutes, putting a notification area notification in the
 // notification area? If so, does pulling down on the notification area and clicking on the
@@ -183,8 +183,8 @@ public class DailySelfie extends ListActivity {
 
     private void saveImageAsSelfie(Uri fullimageUri)
     {
-        // TODO : give image a proper text field
-        Selfie selfie = new Selfie("mad selfie3");
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        Selfie selfie = new Selfie(timeStamp);
         Bitmap thumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(fullimageUri.getPath()), 64, 64);
         Uri thumbnailUri = storeImage(thumbImage);
         selfie.setThumbnailUri(thumbnailUri);
