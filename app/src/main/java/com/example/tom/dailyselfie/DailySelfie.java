@@ -1,6 +1,8 @@
 package com.example.tom.dailyselfie;
 
+import android.app.AlarmManager;
 import android.app.ListActivity;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,6 +10,7 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -68,6 +71,14 @@ public class DailySelfie extends ListActivity {
     private String mThumbnailFolder = null;
     private String mImageFolder = null;
     private final String mSaveFilename = "SelfieList.json";
+    //private static final long INITIAL_ALARM_DELAY = 2 * 60 * 1000L;
+    //private static final long REPEAT_ALARM_DELAY = 2 * 60 * 1000L;
+
+    private static final long INITIAL_ALARM_DELAY = 30 * 1000L;
+    private static final long REPEAT_ALARM_DELAY =  60 * 1000L;
+
+    private PendingIntent mNotificationReceiverPendingIntent;
+    private Intent mNotificationReceiverIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +99,8 @@ public class DailySelfie extends ListActivity {
                 Selfie s = mImagesAdapter.getItem(position);
                 showBigPicture(s.getFullimageUri());
             }});
+
+        setupAlarm();
     }
 
     private void showBigPicture(Uri imageUri) {
@@ -95,6 +108,21 @@ public class DailySelfie extends ListActivity {
         intent.setAction(android.content.Intent.ACTION_VIEW);
         intent.setDataAndType(imageUri, "image/jpg");
         startActivity(intent);
+    }
+
+    private void setupAlarm()
+    {
+        mNotificationReceiverIntent = new Intent(DailySelfie.this,
+                AlarmNotificationReceiver.class);
+
+        mNotificationReceiverPendingIntent = PendingIntent.getBroadcast(
+                DailySelfie.this, 0, mNotificationReceiverIntent, 0);
+
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.setRepeating(AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + INITIAL_ALARM_DELAY,
+                REPEAT_ALARM_DELAY,
+                mNotificationReceiverPendingIntent);
     }
 
     @Override
