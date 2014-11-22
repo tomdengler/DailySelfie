@@ -3,6 +3,8 @@ package com.example.tom.dailyselfie;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -122,13 +124,14 @@ public class DailySelfie extends ListActivity {
         return super.onOptionsItemSelected(item);
         }
 
-    private void addImage(Bitmap imageBitmap)
+    private void saveImageAsSelfie(Uri fullimageUri)
     {
         // TODO : give image a proper text field
         Selfie selfie = new Selfie("mad selfie3");
-        Uri thumbnail = storeImage(imageBitmap);
-        selfie.setThumbnailUri(thumbnail);
-        selfie.setFullimageUri(thumbnail);  // todo: this is only here to have a valid uri for json persist
+        Bitmap thumbImage = ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(fullimageUri.getPath()), 64, 64);
+        Uri thumbnailUri = storeImage(thumbImage);
+        selfie.setThumbnailUri(thumbnailUri);
+        selfie.setFullimageUri(fullimageUri);
         saveSelfie(selfie);
     }
 
@@ -141,15 +144,10 @@ public class DailySelfie extends ListActivity {
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        // File f = createImageFile(true);
-        // mCurrentImageUri = Uri.fromFile(f);
+        File f = createImageFile(false);
+        mCurrentImageUri = Uri.fromFile(f);
 
-        // the following actually creates a jpg file (not a png)
-        // and also makes it so that the thumbnail from data.getExtras() in onActivityResult
-        // is not available.
-        // todo: get back fullsize and convert to thumbnail
-        // todo: persist the selfie array list to get references to the files
-        // takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentImageUri);
+        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, mCurrentImageUri);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, actionCode);
         }
@@ -164,9 +162,7 @@ public class DailySelfie extends ListActivity {
         switch (requestCode) {
             case ACTION_TAKE_PHOTO: {
                 if (resultCode == RESULT_OK) {
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    addImage(imageBitmap);
+                    saveImageAsSelfie(mCurrentImageUri);
                 }
                 else
                     Toast.makeText(this,"The pic was not taken",Toast.LENGTH_LONG).show();
@@ -198,14 +194,17 @@ public class DailySelfie extends ListActivity {
     private File createImageFile(boolean thumbnail)  {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        String imageFileName = "PNG_" + timeStamp + "_";
+        String imageFileName = "IMG_" + timeStamp + "_";
 
-        File storageDir = DailySelfie.this.getExternalFilesDir(mImageFolder);
+        File storageDir = thumbnail?
+                DailySelfie.this.getExternalFilesDir(mThumbnailFolder):
+                DailySelfie.this.getExternalFilesDir(mImageFolder);
+        String suffix = thumbnail?".png":".jpg";
 
         try {
             return File.createTempFile(
                     imageFileName,  /* prefix */
-                    ".png",         /* suffix */
+                    suffix,          /* suffix */
                     storageDir      /* directory */
             );
         }catch (IOException e) {
@@ -219,10 +218,14 @@ public class DailySelfie extends ListActivity {
         mImageFolder = Environment.DIRECTORY_PICTURES+"/images";
         File folder = DailySelfie.this.getExternalFilesDir(mThumbnailFolder);
         if (!folder.exists())
-            folder.mkdir();
+            folder.mkdirs();
+        Log.i(TAG,"mThumbnailFolder:"+folder.toString());
+
         folder = DailySelfie.this.getExternalFilesDir(mImageFolder);
         if (!folder.exists())
-            folder.mkdir();
+            folder.mkdirs();
+        Log.i(TAG,"mImageFolder:"+folder.toString());
+
     }
 
 private void saveSelfie(Selfie selfie) {
