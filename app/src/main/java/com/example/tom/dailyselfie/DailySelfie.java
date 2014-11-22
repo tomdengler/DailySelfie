@@ -74,8 +74,8 @@ public class DailySelfie extends ListActivity {
     //private static final long INITIAL_ALARM_DELAY = 2 * 60 * 1000L;
     //private static final long REPEAT_ALARM_DELAY = 2 * 60 * 1000L;
 
-    private static final long INITIAL_ALARM_DELAY = 30 * 1000L;
-    private static final long REPEAT_ALARM_DELAY =  60 * 1000L;
+    private static final long INITIAL_ALARM_DELAY = 15 * 1000L;
+    private static final long REPEAT_ALARM_DELAY =  20 * 1000L;
 
     private PendingIntent mNotificationReceiverPendingIntent;
     private Intent mNotificationReceiverIntent;
@@ -125,6 +125,14 @@ public class DailySelfie extends ListActivity {
                 mNotificationReceiverPendingIntent);
     }
 
+    private void cancelAlarm()
+    {
+        if (null==mNotificationReceiverPendingIntent)
+            return;
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        am.cancel(mNotificationReceiverPendingIntent);
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -164,6 +172,9 @@ public class DailySelfie extends ListActivity {
                 return true;
             case R.id.take_picture:
                 launchCamera();
+                return true;
+            case R.id.cancel_alarm:
+                cancelAlarm();
                 return true;
             }
 

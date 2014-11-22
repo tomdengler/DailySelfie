@@ -6,6 +6,9 @@
         android:icon="@android:drawable/ic_menu_camera"
         android:showAsAction="ifRoom"
         />
+    <item android:id="@+id/cancel_alarm"
+        android:title="@string/cancel_alarm"
+        android:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
