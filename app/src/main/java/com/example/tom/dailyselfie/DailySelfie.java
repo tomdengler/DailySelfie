@@ -12,9 +12,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +63,7 @@ public class DailySelfie extends ListActivity {
     private Uri mCurrentImageUri = null;
     private String mThumbnailFolder = null;
     private String mImageFolder = null;
+    private final String mSaveFilename = "SelfieList.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +76,6 @@ public class DailySelfie extends ListActivity {
         mImagesAdapter = new SelfieListAdapter(DailySelfie.this,selfies);
         setListAdapter(mImagesAdapter);
     }
-
 
     @Override
     protected void onResume() {
@@ -87,19 +94,7 @@ public class DailySelfie extends ListActivity {
     private List getLocalSelfies()
     {
         Log.i(TAG,"enter getLocalSelfies()");
-        File storageDir = DailySelfie.this.getExternalFilesDir(mThumbnailFolder);
-        File selfieImages[] = storageDir.listFiles();
-
-        List selfies = new ArrayList();
-
-        for (File imageFile : selfieImages)
-        {
-            Selfie selfie = new Selfie("existing");
-            selfie.setThumbnailUri(Uri.fromFile(imageFile));
-            selfies.add(selfie);
-        }
-
-        return selfies;
+        return loadSelfies();
     }
 
     @Override
@@ -131,9 +126,10 @@ public class DailySelfie extends ListActivity {
     {
         // TODO : give image a proper text field
         Selfie selfie = new Selfie("mad selfie3");
-        selfie.setThumbnailUri(storeImage(imageBitmap));
-        selfie.setFullimageUri(mCurrentImageUri);
-        mImagesAdapter.add(selfie);
+        Uri thumbnail = storeImage(imageBitmap);
+        selfie.setThumbnailUri(thumbnail);
+        selfie.setFullimageUri(thumbnail);  // todo: this is only here to have a valid uri for json persist
+        saveSelfie(selfie);
     }
 
     private void launchCamera() {
@@ -164,6 +160,7 @@ public class DailySelfie extends ListActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG,"onActivityResult");
         switch (requestCode) {
             case ACTION_TAKE_PHOTO: {
                 if (resultCode == RESULT_OK) {
@@ -227,6 +224,75 @@ public class DailySelfie extends ListActivity {
         if (!folder.exists())
             folder.mkdir();
     }
+
+private void saveSelfie(Selfie selfie) {
+
+    List<Selfie> selfies = loadSelfies();
+    selfies.add(selfie);
+
+    JSONArray jsonArray = new JSONArray();
+    for (Selfie s : selfies) {
+        jsonArray.put(s.getJSONObject());
+    }
+
+    File f = new File(DailySelfie.this.getExternalFilesDir(null),mSaveFilename);
+    if (f.exists())
+        f.delete();
+
+    try {
+        FileWriter out = new FileWriter(f);
+        out.write(jsonArray.toString());
+        out.flush();
+        out.close();
+
+    } catch (IOException e) {
+        Log.i(TAG,"Error writing file: "+e.getMessage());
+    }
+}
+
+private List loadSelfies() {
+
+    List selfies = new ArrayList();
+
+    File f = new File(DailySelfie.this.getExternalFilesDir(null),mSaveFilename);
+    if (!f.exists())
+        return selfies;
+
+    try {
+        FileReader in = new FileReader(f);
+    } catch (FileNotFoundException e) {};
+
+    StringBuilder text = new StringBuilder();
+    BufferedReader br = null;
+
+    try {
+        br = new BufferedReader(new FileReader(f));
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            text.append(line);
+            text.append('\n');
+        }
+    } catch (IOException e) {
+        // do exception handling
+    } finally {
+        try { br.close(); } catch (Exception e) { }
+    }
+
+    try {
+        JSONArray array = new JSONArray(text.toString());
+        for (int i = 0;i<array.length(); i++) {
+            JSONObject obj = array.getJSONObject(i);
+            selfies.add(new Selfie(obj));
+        }
+
+    } catch (JSONException e) {
+        Log.i(TAG,"loadSelfies JSON Exception: " + e.getMessage());
+    }
+
+    return selfies;
+}
+
 
 
 }
