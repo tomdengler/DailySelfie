@@ -9,8 +9,12 @@
     <item android:id="@+id/cancel_alarm"
         android:title="@string/cancel_alarm"
         android:showAsAction="never" />
+    <item android:id="@+id/delete_all"
+        android:title="@string/delete_all"
+        android:showAsAction="never" />
     <item android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never" />
+
 </menu>

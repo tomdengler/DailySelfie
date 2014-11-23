@@ -176,6 +176,9 @@ public class DailySelfie extends ListActivity {
             case R.id.cancel_alarm:
                 cancelAlarm();
                 return true;
+            case R.id.delete_all:
+                deleteAll();
+                return true;
             }
 
         return super.onOptionsItemSelected(item);
@@ -353,6 +356,25 @@ private List loadSelfies() {
     return selfies;
 }
 
+private void deleteAll()
+{
+    File f = new File(DailySelfie.this.getExternalFilesDir(null),mSaveFilename);
+    f.delete();
+
+    deleteFolderContents(mThumbnailFolder);
+    deleteFolderContents(mImageFolder);
+    mImagesAdapter.clear();
+}
+
+    private void deleteFolderContents(String folder) {
+        File dir = DailySelfie.this.getExternalFilesDir(folder);
+        if (dir.exists())
+        {
+            String[] files = dir.list();
+            for (int i = 0; i < files.length; i++)
+                new File(dir, files[i]).delete();
+        }
+    }
 
 
 }
