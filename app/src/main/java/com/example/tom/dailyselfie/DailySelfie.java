@@ -71,11 +71,8 @@ public class DailySelfie extends ListActivity {
     private String mThumbnailFolder = null;
     private String mImageFolder = null;
     private final String mSaveFilename = "SelfieList.json";
-    //private static final long INITIAL_ALARM_DELAY = 2 * 60 * 1000L;
-    //private static final long REPEAT_ALARM_DELAY = 2 * 60 * 1000L;
-
-    private static final long INITIAL_ALARM_DELAY = 15 * 1000L;
-    private static final long REPEAT_ALARM_DELAY =  20 * 1000L;
+    private static final long INITIAL_ALARM_DELAY = 2 * 60 * 1000L;
+    private static final long REPEAT_ALARM_DELAY = 2 * 60 * 1000L;
 
     private PendingIntent mNotificationReceiverPendingIntent;
     private Intent mNotificationReceiverIntent;
